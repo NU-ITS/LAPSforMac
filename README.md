@@ -89,7 +89,7 @@ Replace ```{AccountShortName}``` with the name of the local admin account you wi
 			Parameter 10: LAPS Account Event FVE
 			Parameter 11: LAPS Run Event
 ### Script
-The current version of the LAPS Account Creation script is available from the following location:
+The current version of the LAPS Account Creation script is available [here](https://github.com/unl/LAPSforMac/blob/master/LAPS%20Account%20Creation.sh).
 
 *Notes: The LAPS Account Creation script performs the following actions:*  
 
@@ -120,7 +120,7 @@ The current version of the LAPS Account Creation script is available from the fo
 		Parameter 6: LAPS Account Shortname
 		
 ### Script
-The current version of the LAPS script is available from the following location:
+The current version of the LAPS script is available [here](https://github.com/unl/LAPSforMac/blob/master/LAPS.sh).
 
 *Notes: The LAPS script performs the following actions:*  
 

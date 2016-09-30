@@ -14,9 +14,10 @@ As written currently, LAPS has several components that are integrated with the J
 5.  The LAPS script.
 6.  A Casper policy that creates the local Account, via a manual trigger.
 7.  A Casper policy that creates the local Account, for FileVault enabled Macs, via a manual trigger.
-8.  A Casper policy that randomizes the Local Admin account password on a specified interval, by running a script.
-9.  A Casper policy that calls LAPS Account Creation script.
-10. A local log for LAPS on each Mac.
+8.  A Casper policy that randomizes the Local Admin account password using a manual trigger, after initial account creation, by running a script.
+9.  A Casper policy that randomizes the Local Admin account password on a specified interval, by running a script.
+10. A Casper policy that calls LAPS Account Creation script.
+11. A local log for LAPS on each Mac.
 
 ## Admin Defined Variables
 ```{APIusername}```  
@@ -192,13 +193,12 @@ This is a separate policy to eliminate false positve errors that accumulate in t
 		Password Hint: (Not Used)
 		Allow user to administer computer: Yes
 		Enable user for FileVault 2: Yes
-## 8. Casper LAPS Policy
-This policy randomizes the local admin accounts password on a specified interval.
+## 8. Casper LAPS Policy – Manual Trigger
+This policy randomizes the local admin accounts password after initial account creation.
 
-	Display Name: LAPS for {AccountShortName}
-	Scope: LAPS {AccountShortName} Account Present
+	Display Name: LAPS for {AccountShortName} - Manual Trigger
+	Scope: All Computers
 	Trigger: 
-		Recurring Check-in
 		Custom: runLAPS
 	Frequency: Once every day (Change this value to meet your institution's needs)
 	Scripts: LAPS
@@ -207,7 +207,20 @@ This policy randomizes the local admin accounts password on a specified interval
 			API Username: {APIusername}
 			API Password: {APIpassword}
 			LAPS Account Shortname: {AccountShortName}
-##9. Casper policy to call the LAPS Account Creation script.
+## 9. Casper LAPS Policy
+This policy randomizes the local admin accounts password on a specified interval.
+
+	Display Name: LAPS for {AccountShortName}
+	Scope: LAPS {AccountShortName} Account Present
+	Trigger: Recurring Check-in
+	Frequency: Once every day (Change this value to meet your institution's needs)
+	Scripts: LAPS
+		Priority: After
+		Parameter Values
+			API Username: {APIusername}
+			API Password: {APIpassword}
+			LAPS Account Shortname: {AccountShortName}
+##10. Casper policy to call the LAPS Account Creation script.
 	Name: LAPS – Create Account
 	Scope: {AccountShortName} LAPS Account Missing
 	Trigger: Startup, Check-in, Enrollment (You may also decide to add a manual trigger for advanced workflows)
@@ -223,5 +236,5 @@ This policy randomizes the local admin accounts password on a specified interval
 			LAPS Account Event: createLAPSaccount-{AccountShortName}
 			LAPS Account Event FVE: createLAPSaccountFVE-{AccountShortName}
 			LAPS Run Event: runLAPS
-## 10. LAPS Log
+##11. LAPS Log
 A log is written to each Mac run LAPS for troubleshooting. The default location for this log is ```/Library/Logs/Casper_LAPS.log``` which can be modified if desired.

@@ -197,7 +197,9 @@ This policy randomizes the local admin accounts password on a specified interval
 
 	Display Name: LAPS for {AccountShortName}
 	Scope: LAPS {AccountShortName} Account Present
-	Trigger: Recurring Check-in
+	Trigger: 
+		Recurring Check-in
+		Custom: runLAPS
 	Frequency: Once every day (Change this value to meet your institution's needs)
 	Scripts: LAPS
 		Priority: After

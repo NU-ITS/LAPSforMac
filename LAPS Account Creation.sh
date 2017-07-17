@@ -221,11 +221,11 @@ CreateLAPSaccount (){
     ScriptLogging "Creating LAPS Account..."
     echo "Creating LAPS Account..."
     if [ "$FVEstatus" == "Off" ];then
-        $jamf_binary policy -event $LAPSaccountEvent
+        $jamf_binary policy -event "$LAPSaccountEvent"
         ScriptLogging "LAPS Account Created..."
         echo "LAPS Account Created..."
     else
-        $jamf_binary policy -event $LAPSaccountEventFVE
+        $jamf_binary policy -event "$LAPSaccountEventFVE"
         ScriptLogging "LAPS Account Created with FVE..."
         echo "LAPS Account Created with FVE..."
     fi

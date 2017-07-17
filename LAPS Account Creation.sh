@@ -91,7 +91,7 @@ if [ "${11}" != "" ] && [ "$LAPSrunEvent" == "" ];then
 LAPSrunEvent="${11}"
 fi
 
-apiURL="https://jss.unl.edu:8443"
+apiURL=$(defaults read /Library/Preferences/com.jamfsoftware.jamf.plist jss_url)
 LogLocation="/Library/Logs/Casper_LAPS.log"
 
 ####################################################################################################

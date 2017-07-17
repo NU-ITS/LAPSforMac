@@ -174,8 +174,19 @@ if [ "$LAPSrunEvent" == "" ];then
     exit 1
 fi
 
+# From Leif Sawyer: Check for connected remote login users to prevent interception of vulnerable secure
+# information (password).
+REMOTE_USERS=$(who | grep -eo '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | wc -l)
+
+if [ "${REMOTE_USERS}" -gt 0 ]; then
+    ScriptLogging "Error:  SSH users are currently connected to this device, making the root password vulnerable to exposure."
+    echo "Error:  SSH users are currently connected to this device, making the root password vulnerable to exposure."
+    ScriptLogging "======== Aborting LAPS Account Creation ========"
+    exit 1
+fi
+
 # Verify resetUser is not a local user on the computer
-checkUser=`dseditgroup -o checkmember -m $LAPSuser localaccounts | awk '{ print $1 }'`
+checkUser=$(dseditgroup -o checkmember -m "$LAPSuser" localaccounts | awk '{ print $1 }')
 
 if [[ "$checkUser" = "yes" ]];then
     ScriptLogging "Error: $LAPSuser already exists as a local user on the Computer"

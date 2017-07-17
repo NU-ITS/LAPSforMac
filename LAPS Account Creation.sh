@@ -234,18 +234,18 @@ CreateLAPSaccount (){
 # Update the LAPS Extention Attribute
 UpdateAPI (){
     ScriptLogging "Recording new password for $LAPSuser into LAPS."
-    /usr/bin/curl -s -f -u ${apiUser}:${apiPass} -X PUT -H "Content-Type: text/xml" -d "${xmlString}" "${apiURL}/JSSResource/computers/udid/$udid"
+    /usr/bin/curl -s -f -u "${apiUser}:${apiPass}" -X PUT -H "Content-Type: text/xml" -d "${xmlString}" "${apiURL}/JSSResource/computers/udid/$udid"
 }
 
 # Check to see if the account is authorized with FileVault 2
 FVEcheck (){
-    userCheck=`fdesetup list | awk -v usrN="$LAPSuserDisplay" -F, 'index($0, usrN) {print $1}'`
+    userCheck=$(fdesetup list | awk -v usrN="$LAPSuserDisplay" -F, 'index($0, usrN) {print $1}')
         if [ "${userCheck}" == "${LAPSuserDisplay}" ]; then
             ScriptLogging "$LAPSuserDisplay is enabled for FileVault 2."
             echo "$LAPSuserDisplay is enabled for FileVault 2."
         else
             ScriptLogging "Error: $LAPSuserDisplay is not enabled for FileVault 2."
-            echo "Error: $LAPSuserDispaly is not enabled for FileVault 2."
+            echo "Error: $LAPSuserDisplay is not enabled for FileVault 2."
         fi
 }
 

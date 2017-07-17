@@ -274,6 +274,6 @@ ScriptLogging "======== LAPS Account Creation Complete ========"
 echo "LAPS Account Creation Finished."
 
 # Run LAPS Password Randomization
-$jamf_binary policy -event $LAPSrunEvent
+$jamf_binary policy -event "$LAPSrunEvent"
 
 exit 0

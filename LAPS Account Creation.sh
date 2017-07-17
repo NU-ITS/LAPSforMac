@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 ####################################################################################################
 #
 #   MIT License
@@ -91,7 +91,7 @@ if [ "${11}" != "" ] && [ "$LAPSrunEvent" == "" ];then
 LAPSrunEvent="${11}"
 fi
 
-apiURL="https://jss.unl.edu:8443"
+apiURL=$(defaults read /Library/Preferences/com.jamfsoftware.jamf.plist jss_url)
 LogLocation="/Library/Logs/Casper_LAPS.log"
 
 ####################################################################################################
@@ -102,16 +102,16 @@ LogLocation="/Library/Logs/Casper_LAPS.log"
 
 udid=$(/usr/sbin/system_profiler SPHardwareDataType | /usr/bin/awk '/Hardware UUID:/ { print $3 }')
 xmlString="<?xml version=\"1.0\" encoding=\"UTF-8\"?><computer><extension_attributes><extension_attribute><name>LAPS</name><value>$newPass</value></extension_attribute></extension_attributes></computer>"
-extAttName="\"LAPS\""
+# extAttName="\"LAPS\""
 FVEstatus=$(fdesetup status | grep -w "FileVault is" | awk '{print $3}' | sed 's/[.]//g')
 
 # Logging Function for reporting actions
 ScriptLogging(){
 
-DATE=`date +%Y-%m-%d\ %H:%M:%S`
-LOG="$LogLocation"
+    DATE=$(date +%Y-%m-%d\ %H:%M:%S)
+    LOG="$LogLocation"
 
-echo "$DATE" " $1" >> $LOG
+    echo "$DATE" " $1" >> $LOG
 }
 
 ScriptLogging "======== Starting LAPS Account Creation ========"
@@ -174,8 +174,19 @@ if [ "$LAPSrunEvent" == "" ];then
     exit 1
 fi
 
+# From Leif Sawyer: Check for connected remote login users to prevent interception of vulnerable secure
+# information (password).
+REMOTE_USERS=$(who | grep -eo '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | wc -l)
+
+if [ "${REMOTE_USERS}" -gt 0 ]; then
+    ScriptLogging "Error:  SSH users are currently connected to this device, making the root password vulnerable to exposure."
+    echo "Error:  SSH users are currently connected to this device, making the root password vulnerable to exposure."
+    ScriptLogging "======== Aborting LAPS Account Creation ========"
+    exit 1
+fi
+
 # Verify resetUser is not a local user on the computer
-checkUser=`dseditgroup -o checkmember -m $LAPSuser localaccounts | awk '{ print $1 }'`
+checkUser=$(dseditgroup -o checkmember -m "$LAPSuser" localaccounts | awk '{ print $1 }')
 
 if [[ "$checkUser" = "yes" ]];then
     ScriptLogging "Error: $LAPSuser already exists as a local user on the Computer"
@@ -210,11 +221,11 @@ CreateLAPSaccount (){
     ScriptLogging "Creating LAPS Account..."
     echo "Creating LAPS Account..."
     if [ "$FVEstatus" == "Off" ];then
-        $jamf_binary policy -event $LAPSaccountEvent
+        $jamf_binary policy -event "$LAPSaccountEvent"
         ScriptLogging "LAPS Account Created..."
         echo "LAPS Account Created..."
     else
-        $jamf_binary policy -event $LAPSaccountEventFVE
+        $jamf_binary policy -event "$LAPSaccountEventFVE"
         ScriptLogging "LAPS Account Created with FVE..."
         echo "LAPS Account Created with FVE..."
     fi
@@ -223,18 +234,18 @@ CreateLAPSaccount (){
 # Update the LAPS Extention Attribute
 UpdateAPI (){
     ScriptLogging "Recording new password for $LAPSuser into LAPS."
-    /usr/bin/curl -s -f -u ${apiUser}:${apiPass} -X PUT -H "Content-Type: text/xml" -d "${xmlString}" "${apiURL}/JSSResource/computers/udid/$udid"
+    /usr/bin/curl -s -f -u "${apiUser}:${apiPass}" -X PUT -H "Content-Type: text/xml" -d "${xmlString}" "${apiURL}/JSSResource/computers/udid/$udid"
 }
 
 # Check to see if the account is authorized with FileVault 2
 FVEcheck (){
-    userCheck=`fdesetup list | awk -v usrN="$LAPSuserDisplay" -F, 'index($0, usrN) {print $1}'`
+    userCheck=$(fdesetup list | awk -v usrN="$LAPSuserDisplay" -F, 'index($0, usrN) {print $1}')
         if [ "${userCheck}" == "${LAPSuserDisplay}" ]; then
             ScriptLogging "$LAPSuserDisplay is enabled for FileVault 2."
             echo "$LAPSuserDisplay is enabled for FileVault 2."
         else
             ScriptLogging "Error: $LAPSuserDisplay is not enabled for FileVault 2."
-            echo "Error: $LAPSuserDispaly is not enabled for FileVault 2."
+            echo "Error: $LAPSuserDisplay is not enabled for FileVault 2."
         fi
 }
 
@@ -263,6 +274,6 @@ ScriptLogging "======== LAPS Account Creation Complete ========"
 echo "LAPS Account Creation Finished."
 
 # Run LAPS Password Randomization
-$jamf_binary policy -event $LAPSrunEvent
+$jamf_binary policy -event "$LAPSrunEvent"
 
 exit 0

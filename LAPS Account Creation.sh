@@ -102,16 +102,16 @@ LogLocation="/Library/Logs/Casper_LAPS.log"
 
 udid=$(/usr/sbin/system_profiler SPHardwareDataType | /usr/bin/awk '/Hardware UUID:/ { print $3 }')
 xmlString="<?xml version=\"1.0\" encoding=\"UTF-8\"?><computer><extension_attributes><extension_attribute><name>LAPS</name><value>$newPass</value></extension_attribute></extension_attributes></computer>"
-extAttName="\"LAPS\""
+# extAttName="\"LAPS\""
 FVEstatus=$(fdesetup status | grep -w "FileVault is" | awk '{print $3}' | sed 's/[.]//g')
 
 # Logging Function for reporting actions
 ScriptLogging(){
 
-DATE=`date +%Y-%m-%d\ %H:%M:%S`
-LOG="$LogLocation"
+    DATE=$(date +%Y-%m-%d\ %H:%M:%S)
+    LOG="$LogLocation"
 
-echo "$DATE" " $1" >> $LOG
+    echo "$DATE" " $1" >> $LOG
 }
 
 ScriptLogging "======== Starting LAPS Account Creation ========"

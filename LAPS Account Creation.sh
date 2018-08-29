@@ -108,7 +108,7 @@ FVEstatus=$(fdesetup status | grep -w "FileVault is" | awk '{print $3}' | sed 's
 # Logging Function for reporting actions
 ScriptLogging(){
 
-DATE=`date +%Y-%m-%d\ %H:%M:%S`
+DATE=$(date +%Y-%m-%d\ %H:%M:%S)
 LOG="$LogLocation"
 
 echo "$DATE" " $1" >> $LOG
@@ -175,7 +175,7 @@ if [ "$LAPSrunEvent" == "" ];then
 fi
 
 # Verify resetUser is not a local user on the computer
-checkUser=`dseditgroup -o checkmember -m $LAPSuser localaccounts | awk '{ print $1 }'`
+checkUser=$(dseditgroup -o checkmember -m $LAPSuser localaccounts | awk '{ print $1 }')
 
 if [[ "$checkUser" = "yes" ]];then
     ScriptLogging "Error: $LAPSuser already exists as a local user on the Computer"
@@ -192,7 +192,7 @@ ScriptLogging "Parameters Verified."
 # Identify the location of the jamf binary for the jamf_binary variable.
 CheckBinary (){
 # Identify location of jamf binary.
-jamf_binary=`/usr/bin/which jamf`
+jamf_binary=$(/usr/bin/which jamf)
 
 if [[ "$jamf_binary" == "" ]] && [[ -e "/usr/sbin/jamf" ]] && [[ ! -e "/usr/local/bin/jamf" ]]; then
 jamf_binary="/usr/sbin/jamf"
@@ -228,7 +228,7 @@ UpdateAPI (){
 
 # Check to see if the account is authorized with FileVault 2
 FVEcheck (){
-    userCheck=`fdesetup list | awk -v usrN="$LAPSuserDisplay" -F, 'index($0, usrN) {print $1}'`
+    userCheck=$(fdesetup list | awk -v usrN="$LAPSuserDisplay" -F, 'index($0, usrN) {print $1}')
         if [ "${userCheck}" == "${LAPSuserDisplay}" ]; then
             ScriptLogging "$LAPSuserDisplay is enabled for FileVault 2."
             echo "$LAPSuserDisplay is enabled for FileVault 2."

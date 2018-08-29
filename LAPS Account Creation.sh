@@ -32,6 +32,7 @@
 #	- 05/04/2016 Created by Phil Redfern
 #   - 05/06/2016 Updated by Phil Redfern, improved local logging and security update.
 #   - 05/16/2016 Updated by Phil Redfern, added logic for FileVault Encryption
+#   - 08/29/2018 Updated by Ross Derewianko, Changed ``to $() for variables executing commands.
 #
 #   - This script will create a local Administrator account to be used with LAPS.
 #

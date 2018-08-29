@@ -34,6 +34,7 @@
 #   - 05/02/2016 Updated by Phil Redfern and John Ross, added keychain update and fixed a bug where no stored LAPS password would cause the process to hang.
 #   - 05/06/2016 Updated by Phil Redfern, improved local logging and increased random passcode length.
 #   - 05/11/2016 Updated by Phil Redfern, removed ambiguous characters from the password generator.
+#   - 08/29/2018 Updated by Ross Derewianko, Changed ``to $() for variables executing commands.
 #
 #   - This script will randomize the password of the specified user account and post the password to the LAPS Extention Attribute in Casper.
 #
@@ -94,7 +95,7 @@ oldPass=$(curl -s -f -u $apiUser:$apiPass -H "Accept: application/xml" $apiURL/J
 # Logging Function for reporting actions
 ScriptLogging(){
 
-DATE=`date +%Y-%m-%d\ %H:%M:%S`
+DATE=$(date +%Y-%m-%d\ %H:%M:%S)
 LOG="$LogLocation"
 
 echo "$DATE" " $1" >> $LOG
@@ -126,7 +127,7 @@ if [ "$resetUser" == "" ];then
 fi
 
 # Verify resetUser is a local user on the computer
-checkUser=`dseditgroup -o checkmember -m $resetUser localaccounts | awk '{ print $1 }'`
+checkUser=$(dseditgroup -o checkmember -m $resetUser localaccounts | awk '{ print $1 }')
 
 if [[ "$checkUser" = "yes" ]];then
     echo "$resetUser is a local user on the Computer"
@@ -141,7 +142,7 @@ ScriptLogging "Parameters Verified."
 # Identify the location of the jamf binary for the jamf_binary variable.
 CheckBinary (){
 # Identify location of jamf binary.
-jamf_binary=`/usr/bin/which jamf`
+jamf_binary=$(/usr/bin/which jamf)
 
 if [[ "$jamf_binary" == "" ]] && [[ -e "/usr/sbin/jamf" ]] && [[ ! -e "/usr/local/bin/jamf" ]]; then
 jamf_binary="/usr/sbin/jamf"
@@ -167,7 +168,7 @@ else
     echo "A Password was found in LAPS."
 fi
 
-passwdA=`dscl /Local/Default -authonly $resetUser $oldPass`
+passwdA=$(dscl /Local/Default -authonly $resetUser $oldPass)
 
 if [ "$passwdA" == "" ];then
     ScriptLogging "Password stored in LAPS is correct for $resetUser."
@@ -196,7 +197,7 @@ fi
 # Verify the new User Password
 CheckNewPassword (){
 ScriptLogging "Verifying new password for $resetUser."
-passwdB=`dscl /Local/Default -authonly $resetUser $newPass`
+passwdB=$(dscl /Local/Default -authonly $resetUser $newPass)
 
 if [ "$passwdB" == "" ];then
     ScriptLogging "New password for $resetUser is verified."
@@ -219,7 +220,7 @@ sleep 1
 LAPSpass=$(curl -s -f -u $apiUser:$apiPass -H "Accept: application/xml" $apiURL/JSSResource/computers/udid/$udid/subset/extension_attributes | xpath "//extension_attribute[name=$extAttName]" 2>&1 | awk -F'<value>|</value>' '{print $2}')
 
 ScriptLogging "Verifying LAPS password for $resetUser."
-passwdC=`dscl /Local/Default -authonly $resetUser $LAPSpass`
+passwdC=$(dscl /Local/Default -authonly $resetUser $LAPSpass)
 if [ "$passwdC" == "" ];then
     ScriptLogging "LAPS password for $resetUser is verified."
     echo "LAPS password for $resetUser is verified."
